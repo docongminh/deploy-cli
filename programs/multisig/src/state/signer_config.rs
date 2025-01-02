@@ -2,6 +2,8 @@ use std::cmp::max;
 
 use anchor_lang::{prelude::*, system_program};
 
+use crate::MultiSigError;
+
 #[account]
 pub struct SignerConfig {
     pub creator: Pubkey,
@@ -20,6 +22,10 @@ impl SignerConfig {
         8 + 1 + 32 * (2 + num_signers) + 1 + 2
     }
 
+    pub fn update_signers_required(&mut self, new_signer_required: u16) {
+        self.signers_required = new_signer_required
+    }
+
     pub fn find_signer(&self, signer: Pubkey) -> Option<usize> {
         self.signers.binary_search(&signer).ok()
     }
@@ -31,11 +37,23 @@ impl SignerConfig {
     pub fn remove_signer(&mut self, signer: Pubkey) -> Result<()> {
         let index = match self.find_signer(signer) {
             Some(index) => index,
-            None => todo!(),
+            None => return err!(MultiSigError::SignerIsNotExisted),
         };
 
         self.signers.remove(index);
         Ok(())
+    }
+
+    /// Reject Tx if nof rejected > total_signers - signer_required.
+    /// derive: reject_threshold = total_signers - signer_required + 1;
+    /// rejected >= reject_threshold will drop Tx.
+    pub fn reject_threshold(&self) -> usize {
+        self.signers
+            .len()
+            .checked_sub(self.signers_required as usize)
+            .unwrap()
+            .checked_add(1)
+            .unwrap()
     }
 
     pub fn extend_space<'info>(

@@ -14,7 +14,7 @@ pub struct CreateSigners<'info> {
 }
 
 impl CreateSigners<'_> {
-    pub fn handler(ctx: Context<Self>, params: CreateSignersParams) -> Result<()> {
+    pub fn create_signers_config_handler(ctx: Context<Self>, params: CreateSignersParams) -> Result<()> {
         let signer_config = &mut ctx.accounts.signer_config;
         signer_config.creator = ctx.accounts.creator.key();
         signer_config.master_authority = params.master_authority;
