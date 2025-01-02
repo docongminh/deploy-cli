@@ -1,12 +1,12 @@
 [package]
-name = "signers"
+name = "multisig"
 version = "0.1.0"
 description = "Created with Anchor"
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "signers"
+name = "multisig"
 
 [features]
 default = []
