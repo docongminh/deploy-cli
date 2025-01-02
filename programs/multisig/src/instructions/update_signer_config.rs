@@ -55,6 +55,8 @@ impl UpdateSignerConfig<'_> {
             ctx.accounts.system_program.to_account_info(),
         )?;
 
+        signer_config.validate_post_data()?;
+
         Ok(())
     }
 
@@ -73,6 +75,8 @@ impl UpdateSignerConfig<'_> {
     ) -> Result<()> {
         let signer_config = &mut ctx.accounts.signer_config;
         signer_config.update_signers_required(params.new_signer_required);
+
+        signer_config.validate_post_data()?;
 
         Ok(())
     }

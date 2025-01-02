@@ -22,6 +22,7 @@ impl CreateSigners<'_> {
         signer_config.signers = params.signers;
         signer_config.bump = ctx.bumps.signer_config;
 
+        signer_config.validate_post_data()?;
         Ok(())
     }
 }

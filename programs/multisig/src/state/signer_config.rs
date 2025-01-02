@@ -22,6 +22,20 @@ impl SignerConfig {
         8 + 1 + 32 * (2 + num_signers) + 1 + 2
     }
 
+    pub fn validate_post_data(&self) -> Result<()> {
+        require!(
+            self.signers.len() <= usize::from(u16::MAX),
+            MultiSigError::TooManySigners
+        );
+
+        let is_duplicate = self.signers.windows(2).any(|w| w[0] == w[1]);
+        require!(!is_duplicate, MultiSigError::DuplicateSigner);
+
+        require!(self.signers_required > 0, MultiSigError::InvalidSignerRequired);
+        
+        Ok(())
+    }
+
     pub fn update_signers_required(&mut self, new_signer_required: u16) {
         self.signers_required = new_signer_required
     }
